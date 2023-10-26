@@ -7,6 +7,9 @@ const _addr = ":8080"
 func newGinServer() {
 	engine := gin.New()
 	engine.GET("/", func(c *gin.Context) {
+		c.ShouldBindJSON(nil)
+		c.ShouldBindHeader(nil)
+		c.ShouldBindUri(nil)
 		method := c.Request.Method
 		c.JSON(200, gin.H{"message": method})
 		c.Next()

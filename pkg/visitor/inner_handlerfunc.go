@@ -53,3 +53,33 @@ func (v *Visitor) ReplaceGinNext(c *astutil.Cursor) {
 		}
 	}
 }
+
+func (v *Visitor) ReplaceGinShouldBindJSON(c *astutil.Cursor) {
+	n := c.Node()
+	if callExpr, ok := n.(*ast.CallExpr); ok {
+		// 检查是否是 c.ShouldBindJSON(nil) 调用
+		selectorExpr, isSelector := callExpr.Fun.(*ast.SelectorExpr)
+		_, isIdent := selectorExpr.X.(*ast.Ident)
+
+		if isSelector && isIdent {
+			switch selectorExpr.Sel.Name {
+			case "ShouldBindJSON":
+				selectorExpr.Sel.Name = "BindJSON"
+			case "ShouldBindQuery":
+				selectorExpr.Sel.Name = "BindQuery"
+			case "ShouldBind":
+				selectorExpr.Sel.Name = "Bind"
+			case "ShouldBindHeader":
+				selectorExpr.Sel.Name = "BindHeader"
+			case "ShouldBindUri", "ShouldBindYAML", "ShouldBindXML", "ShouldBindTOML":
+				comment := &ast.Comment{
+					Text:  "// TODO: unsupport this method",
+					Slash: selectorExpr.Pos() - 1,
+				}
+
+				// 将注释添加到文件的注释列表
+				v.f.Comments = append(v.f.Comments, &ast.CommentGroup{List: []*ast.Comment{comment}})
+			}
+		}
+	}
+}

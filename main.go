@@ -63,6 +63,7 @@ func main() {
 			v.ReplaceGinH2UtilsH(c)
 			v.ReplaceGinRequestMethod(c)
 			v.ReplaceGinNext(c)
+			v.ReplaceGinShouldBindJSON(c)
 		}
 		v.ReplaceGinRun2HertzSpin(c)
 		return true
