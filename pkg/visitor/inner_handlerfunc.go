@@ -32,3 +32,24 @@ func (v *Visitor) ReplaceGinRequestMethod(c *astutil.Cursor) {
 		}
 	}
 }
+func (v *Visitor) ReplaceGinNext(c *astutil.Cursor) {
+	n := c.Node()
+	if callExpr, ok := n.(*ast.CallExpr); ok {
+		// 检查是否是 c.Next() 调用
+		selectorExpr, isSelector := callExpr.Fun.(*ast.SelectorExpr)
+		ident, isIdent := selectorExpr.X.(*ast.Ident)
+
+		if isSelector && isIdent {
+			if selectorExpr.Sel.Name == "Next" {
+				if ident.Name == "c" {
+					ctxIdent := &ast.Ident{Name: "ctx"}
+					callExpr.Args = []ast.Expr{ctxIdent}
+				}
+				if ident.Name == "ctx" {
+					ctxIdent := &ast.Ident{Name: "c"}
+					callExpr.Args = []ast.Expr{ctxIdent}
+				}
+			}
+		}
+	}
+}

@@ -37,7 +37,10 @@ func main() {
 	fset := token.NewFileSet()
 	path, _ := filepath.Abs(rootPath)
 	file, _ := parser.ParseFile(fset, path, nil, parser.AllErrors)
-
+	if mode == "ast" {
+		ast.Print(fset, file)
+		return
+	}
 	v := visitor.NewVisitor(fset, file)
 
 	astutil.Apply(file, func(c *astutil.Cursor) bool {
@@ -59,6 +62,7 @@ func main() {
 			v.AddImport(mconsts.HertzUtils)
 			v.ReplaceGinH2UtilsH(c)
 			v.ReplaceGinRequestMethod(c)
+			v.ReplaceGinNext(c)
 		}
 		v.ReplaceGinRun2HertzSpin(c)
 		return true

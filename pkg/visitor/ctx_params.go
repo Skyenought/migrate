@@ -40,22 +40,28 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 	*/
 	exprStmt, ok := c.Node().(*ast.ExprStmt)
 	if ok {
-		args := exprStmt.X.(*ast.CallExpr).Args
-		// remove route path
-		args = args[1:]
-		for _, arg := range args {
-			funcLit, ok := arg.(*ast.FuncLit)
-			if ok {
-				expr := funcLit.Type.Params.List[0]
-				paramName := expr.Names[0].Name
-				switch paramName {
-				case "c":
-					if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
-						mutils.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
-					}
-				case "ctx":
-					if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
-						mutils.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+		callExpr, ok := exprStmt.X.(*ast.CallExpr)
+		if ok {
+			args := callExpr.Args
+			if args == nil {
+				return
+			}
+			// remove route path
+			args = args[1:]
+			for _, arg := range args {
+				funcLit, ok := arg.(*ast.FuncLit)
+				if ok {
+					expr := funcLit.Type.Params.List[0]
+					paramName := expr.Names[0].Name
+					switch paramName {
+					case "c":
+						if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
+							mutils.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
+						}
+					case "ctx":
+						if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
+							mutils.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+						}
 					}
 				}
 			}

@@ -9,6 +9,7 @@ func newGinServer() {
 	engine.GET("/", func(c *gin.Context) {
 		method := c.Request.Method
 		c.JSON(200, gin.H{"message": method})
+		c.Next()
 	})
 	engine.GET("/echo", echoHandler)
 	engine.Run(_addr)
