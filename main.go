@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
 	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
 	"go/ast"
 	"go/format"
@@ -13,7 +14,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hertz-contrib/migrate/pkg/common/mconsts"
 	"github.com/hertz-contrib/migrate/pkg/visitor"
 
 	"golang.org/x/tools/go/ast/astutil"

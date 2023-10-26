@@ -1,11 +1,11 @@
 package visitor
 
 import (
+	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
 	"go/ast"
 
 	"golang.org/x/tools/go/ast/astutil"
 
-	"github.com/hertz-contrib/migrate/pkg/common/mconsts"
 	"github.com/hertz-contrib/migrate/pkg/common/utils"
 )
 

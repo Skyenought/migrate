@@ -2,13 +2,12 @@ package mutils
 
 import (
 	"fmt"
+	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
 	"go/ast"
 	"go/token"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/hertz-contrib/migrate/pkg/common/mconsts"
 )
 
 func DelElementFromSlice[T comparable](a []T, ele T) []T {
