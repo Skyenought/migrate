@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
+	"go/ast"
 	"go/format"
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/hertz-contrib/migrate/pkg/common/mconsts"
@@ -16,19 +19,23 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-var rootPath string
+var (
+	rootPath string
+	mode     string
+)
 
 func init() {
 	//mutils.FormatCode("/Users/skyenought/gopath/src/github.com/Skyenought/migrate")
-	flag.StringVar(&rootPath, "root", "", "root path")
+	flag.StringVar(&rootPath, "root", "./testfile.go", "root path")
+	flag.StringVar(&mode, "mode", "print", "switch tool mode")
 }
 
 func main() {
 	var err error
 	flag.Parse()
-	println(rootPath)
+
 	fset := token.NewFileSet()
-	path, _ := filepath.Abs("./testfile.go")
+	path, _ := filepath.Abs(rootPath)
 	file, _ := parser.ParseFile(fset, path, nil, parser.AllErrors)
 
 	v := visitor.NewVisitor(fset, file)
@@ -72,28 +79,28 @@ func main() {
 		panic(err)
 	}
 
-	// ast.Print(fset, file)
-	var output []byte
-	buffer := bytes.NewBuffer(output)
-	err = format.Node(buffer, fset, file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// 输出Go代码
-	fmt.Println(buffer.String())
+	switch mode {
+	case "ast":
+		ast.Print(fset, file)
+	case "print":
+		var output []byte
+		buffer := bytes.NewBuffer(output)
+		_ = format.Node(buffer, fset, file)
+		fmt.Println(buffer.String())
+	case "file":
+		var output bytes.Buffer
+		err = format.Node(&output, fset, file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// 写回原始文件
+		err = os.WriteFile(path, output.Bytes(), os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	//var output bytes.Buffer
-	//err = format.Node(&output, fset, file)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//// 写回原始文件
-	//err = os.WriteFile(path, output.Bytes(), os.ModePerm)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//// 输出Go代码
-	//fmt.Println("Cod e has been updated and saved to the original file.")
-	//mutils.FormatCode("/Users/skyenought/gopath/src/github.com/Skyenought/migrate")
+		// 输出Go代码
+		fmt.Println("Cod e has been updated and saved to the original file.")
+		mutils.FormatCode("/Users/skyenought/gopath/src/github.com/Skyenought/migrate")
+	}
 }
