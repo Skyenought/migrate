@@ -8,7 +8,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-func (v *Visitor) ReplaceUtilsH(c *astutil.Cursor) {
+func (v *Visitor) ReplaceGinH2UtilsH(c *astutil.Cursor) {
 	sel, ok := c.Node().(*ast.SelectorExpr)
 	if ok {
 		// 如果是 gin.H 的形式，替换为 utils.H

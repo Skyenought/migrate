@@ -44,7 +44,7 @@ func main() {
 		// gin -> server
 		{
 			v.RewriteImport(mconsts.GinPkg, mconsts.HertzServerPkg)
-			v.ReplaceServerNew(c)
+			v.ReplaceGinNew2ServerNew(c)
 		}
 		// rename gin.HandlerFunc -> app.HandlerFunc
 		{
@@ -57,10 +57,10 @@ func main() {
 		// inner handlerFunc
 		{
 			v.AddImport(mconsts.HertzUtils)
-			v.ReplaceUtilsH(c)
+			v.ReplaceGinH2UtilsH(c)
 			v.ReplaceGinRequestMethod(c)
 		}
-		v.ReplaceHertzSpin(c)
+		v.ReplaceGinRun2HertzSpin(c)
 		return true
 	}, nil)
 

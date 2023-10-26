@@ -8,7 +8,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-func (v *Visitor) ReplaceHertzSpin(c *astutil.Cursor) {
+func (v *Visitor) ReplaceGinRun2HertzSpin(c *astutil.Cursor) {
 	call, ok := c.Node().(*ast.CallExpr)
 	if ok {
 		if mutils.IsDot(call.Fun, "Run") && len(call.Args) == 1 {

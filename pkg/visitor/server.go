@@ -8,7 +8,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-func (v *Visitor) ReplaceServerNew(c *astutil.Cursor) {
+func (v *Visitor) ReplaceGinNew2ServerNew(c *astutil.Cursor) {
 	// gin -> server
 	call, ok := c.Node().(*ast.CallExpr)
 	if ok {
