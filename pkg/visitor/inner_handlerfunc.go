@@ -1,7 +1,6 @@
 package visitor
 
 import (
-	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
 	"go/ast"
 
 	"golang.org/x/tools/go/ast/astutil"
@@ -85,8 +84,7 @@ func (v *Visitor) ReplaceGinNext(c *astutil.Cursor) {
 						ctxIdent := &ast.Ident{Name: "c"}
 						callExpr.Args = []ast.Expr{ctxIdent}
 					} else {
-						alias := string(mutils.GenerateRandomLetter()) + ident.Name
-						ctxIdent := &ast.Ident{Name: alias}
+						ctxIdent := &ast.Ident{Name: "ctx"}
 						callExpr.Args = []ast.Expr{ctxIdent}
 					}
 				}
