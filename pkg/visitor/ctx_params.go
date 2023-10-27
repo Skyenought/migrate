@@ -67,4 +67,32 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 			}
 		}
 	}
+
+	/*
+		遇到 return func(c context.Context, ctx *app.RequestContext) 这种情况
+	*/
+	funcLit, ok := c.Node().(*ast.FuncLit)
+	if ok {
+		for _, field := range funcLit.Type.Params.List {
+			starExpr, ok := field.Type.(*ast.StarExpr)
+			if ok {
+				selExpr, ok := starExpr.X.(*ast.SelectorExpr)
+				if ok {
+					if selExpr.X.(*ast.Ident).Name == "gin" && selExpr.Sel.Name == "Context" {
+						paramName := field.Names[0].Name
+						switch paramName {
+						case "c":
+							if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+								mutils.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
+							}
+						case "ctx":
+							if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+								mutils.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

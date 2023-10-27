@@ -1,11 +1,14 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 const _addr = ":8080"
 
 func newGinServer() {
 	engine := gin.New()
+	engine.Use(testMiddleware())
 	engine.GET("/", func(c *gin.Context) {
 		type Test struct {
 			Name        string `json:"name" uri:"name"`
@@ -15,6 +18,7 @@ func newGinServer() {
 		c.ShouldBindJSON(&tt)
 		c.ShouldBindHeader(&tt)
 		c.ShouldBindUri(&tt)
+		c.Request.FormValue("")
 		method := c.Request.Method
 		c.JSON(200, gin.H{"message": method})
 		c.Next()
@@ -25,4 +29,10 @@ func newGinServer() {
 
 func echoHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})
+}
+
+func testMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+	}
 }
