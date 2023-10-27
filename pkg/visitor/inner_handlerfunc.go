@@ -54,7 +54,7 @@ func (v *Visitor) ReplaceGinNext(c *astutil.Cursor) {
 	}
 }
 
-func (v *Visitor) ReplaceGinShouldBindJSON(c *astutil.Cursor) {
+func (v *Visitor) ReplaceGinShouldBindXxx(c *astutil.Cursor) {
 	n := c.Node()
 	if callExpr, ok := n.(*ast.CallExpr); ok {
 		// 检查是否是 c.ShouldBindJSON(nil) 调用
@@ -71,9 +71,11 @@ func (v *Visitor) ReplaceGinShouldBindJSON(c *astutil.Cursor) {
 				selectorExpr.Sel.Name = "Bind"
 			case "ShouldBindHeader":
 				selectorExpr.Sel.Name = "BindHeader"
-			case "ShouldBindUri", "ShouldBindYAML", "ShouldBindXML", "ShouldBindTOML":
+			case "ShouldBindUri":
+				selectorExpr.Sel.Name = "BindPath"
+			case "ShouldBindYAML", "ShouldBindXML", "ShouldBindTOML":
 				comment := &ast.Comment{
-					Text:  "// TODO: unsupport this method",
+					Text:  "// TODO: unsupported this method",
 					Slash: selectorExpr.Pos() - 1,
 				}
 

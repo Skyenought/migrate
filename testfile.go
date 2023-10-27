@@ -7,9 +7,14 @@ const _addr = ":8080"
 func newGinServer() {
 	engine := gin.New()
 	engine.GET("/", func(c *gin.Context) {
-		c.ShouldBindJSON(nil)
-		c.ShouldBindHeader(nil)
-		c.ShouldBindUri(nil)
+		type Test struct {
+			Name        string `json:"name" uri:"name"`
+			ContentType string `json:"contentType" header:"Content-Type"`
+		}
+		var tt Test
+		c.ShouldBindJSON(&tt)
+		c.ShouldBindHeader(&tt)
+		c.ShouldBindUri(&tt)
 		method := c.Request.Method
 		c.JSON(200, gin.H{"message": method})
 		c.Next()

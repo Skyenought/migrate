@@ -44,6 +44,10 @@ func main() {
 	v := visitor.NewVisitor(fset, file)
 
 	astutil.Apply(file, func(c *astutil.Cursor) bool {
+		// replace go tag
+		{
+			v.ReplaceGoTag(c, "uri", "path")
+		}
 		// gin -> server
 		{
 			v.RewriteImport(mconsts.GinPkg, mconsts.HertzServerPkg)
@@ -63,7 +67,7 @@ func main() {
 			v.ReplaceGinH2UtilsH(c)
 			v.ReplaceGinRequestMethod(c)
 			v.ReplaceGinNext(c)
-			v.ReplaceGinShouldBindJSON(c)
+			v.ReplaceGinShouldBindXxx(c)
 		}
 		v.ReplaceGinRun2HertzSpin(c)
 		return true
