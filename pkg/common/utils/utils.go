@@ -2,12 +2,15 @@ package mutils
 
 import (
 	"fmt"
-	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
 	"go/ast"
 	"go/token"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+
+	"github.com/bytedance/gopkg/util/logger"
+	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
 )
 
 func DelElementFromSlice[T comparable](a []T, ele T) []T {
@@ -23,7 +26,7 @@ func DelElementFromSlice[T comparable](a []T, ele T) []T {
 
 func GetAllGoFiles(dir string) []string {
 	var goFiles []string
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -32,6 +35,9 @@ func GetAllGoFiles(dir string) []string {
 		}
 		return nil
 	})
+	if err != nil {
+		logger.Errorf("get golang file error: %s", err.Error())
+	}
 	return goFiles
 }
 
@@ -88,6 +94,20 @@ func IsSrvRequestFunc(funcIdent *ast.Ident) bool {
 		funcIdent.Name == "HEAD" ||
 		funcIdent.Name == "OPTIONS" ||
 		funcIdent.Name == "Any"
+}
+
+func GetImportPaths(file *ast.File) []string {
+	var paths []string
+	for _, importSpec := range file.Imports {
+		// 获取导入路径
+		importPath, err := strconv.Unquote(importSpec.Path.Value)
+		if err != nil {
+			logger.Errorf("get import Paths error: %s", err.Error())
+			return nil
+		}
+		paths = append(paths, importPath)
+	}
+	return paths
 }
 
 func IsPkgDot(expr ast.Expr, pkg, name string) bool {

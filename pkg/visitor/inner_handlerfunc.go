@@ -2,6 +2,7 @@ package visitor
 
 import (
 	"go/ast"
+
 	"golang.org/x/tools/go/ast/astutil"
 )
 
@@ -32,6 +33,7 @@ func (v *Visitor) ReplaceGinRequestMethod(c *astutil.Cursor) {
 		}
 	}
 }
+
 func (v *Visitor) ReplaceGinNext(c *astutil.Cursor) {
 	n := c.Node()
 	if callExpr, ok := n.(*ast.CallExpr); ok {

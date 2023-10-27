@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
-	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -13,6 +11,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
+	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
 
 	"github.com/hertz-contrib/migrate/pkg/visitor"
 
@@ -25,7 +26,7 @@ var (
 )
 
 func init() {
-	//mutils.FormatCode("/Users/skyenought/gopath/src/github.com/Skyenought/migrate")
+	// mutils.FormatCode("/Users/skyenought/gopath/src/github.com/Skyenought/migrate")
 	flag.StringVar(&rootPath, "root", "./testfile.go", "root path")
 	flag.StringVar(&mode, "mode", "print", "switch tool mode")
 }
