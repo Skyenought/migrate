@@ -13,16 +13,16 @@ func newGinServer() {
 	engine := gin.New()
 	mutils.IsSrvRequestFunc(nil)
 	server.H()
-	engine.GET("/", func(c *gin.Context) {
-		method := c.Request.Method
-		_ = c.Request.FormValue("test")
-		c.JSON(200, gin.H{"message": method})
-		c.Next()
+	engine.GET("/", func(cx *gin.Context) {
+		method := cx.Request.Method
+		_ = cx.Request.FormValue("test")
+		cx.JSON(200, gin.H{"message": method})
+		cx.Next()
 	})
 	engine.GET("/echo", echoHandler)
-	engine.POST("/", func(c *gin.Context) {
-		value := c.Request.FormValue("test")
-		c.JSON(200, gin.H{"message": value})
+	engine.POST("/", func(cc *gin.Context) {
+		value := cc.Request.FormValue("test")
+		cc.JSON(200, gin.H{"message": value})
 	})
 	engine.Run(_addr)
 }

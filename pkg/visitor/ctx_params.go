@@ -19,15 +19,15 @@ func (v *Visitor) ChangeReqCtxSignature(c *astutil.Cursor) {
 	}
 	for _, field := range funcDecl.Type.Params.List {
 		if len(field.Names) == 1 {
-			// 检查 *gin.Context 参数
-			switch field.Names[0].Name {
-			case "c":
-				if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+			if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+				// 检查 *gin.Context 参数
+				switch field.Names[0].Name {
+				case "c":
 					v.ReplaceHandlerFuncParams(funcDecl, "ctx", "c")
-				}
-			case "ctx":
-				if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+				case "ctx":
 					v.ReplaceHandlerFuncParams(funcDecl, "c", "ctx")
+				default:
+					v.ReplaceHandlerFuncParams(funcDecl, "ctx", field.Names[0].Name)
 				}
 			}
 		}
@@ -54,14 +54,14 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 				if ok {
 					expr := funcLit.Type.Params.List[0]
 					paramName := expr.Names[0].Name
-					switch paramName {
-					case "c":
-						if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
+					if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
+						switch paramName {
+						case "c":
 							v.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
-						}
-					case "ctx":
-						if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
+						case "ctx":
 							v.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+						default:
+							v.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", expr.Names[0].Name)
 						}
 					}
 				}
@@ -81,14 +81,14 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 				if ok {
 					if selExpr.X.(*ast.Ident).Name == "gin" && selExpr.Sel.Name == "Context" {
 						paramName := field.Names[0].Name
-						switch paramName {
-						case "c":
-							if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+						if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+							switch paramName {
+							case "c":
 								v.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
-							}
-						case "ctx":
-							if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
+							case "ctx":
 								v.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+							default:
+								v.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", field.Names[0].Name)
 							}
 						}
 					}

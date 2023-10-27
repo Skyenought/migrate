@@ -3,9 +3,6 @@ package visitor
 import (
 	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
 	"go/ast"
-	"math/rand"
-	"time"
-
 	"golang.org/x/tools/go/ast/astutil"
 )
 
@@ -59,26 +56,11 @@ func generateAlias(s string) string {
 	getlastWorld := func(s string) string {
 		return mutils.GetLastWord(s)
 	}
-	source := rand.NewSource(time.Now().UnixNano())
-	generator := rand.New(source)
 
 	// 生成随机字母
-	randomLetter := generateRandomLetter(generator)
+	randomLetter := mutils.GenerateRandomLetter()
 	alias := string(randomLetter) + getlastWorld(s)
 	return alias
-}
-
-func generateRandomLetter(generator *rand.Rand) rune {
-	// Alphabet
-	letters := "abcdefghijklmnopqrstuvwxyzdfjfsf"
-
-	// Generate a random index
-	randomIndex := generator.Intn(len(letters))
-
-	// Get the random letter
-	randomLetter := rune(letters[randomIndex])
-
-	return randomLetter
 }
 
 func ImportExists(f *ast.File, path string) bool {

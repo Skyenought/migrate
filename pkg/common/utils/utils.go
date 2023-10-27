@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bytedance/gopkg/util/logger"
 )
@@ -89,4 +91,19 @@ func GetLastWord(s string) string {
 	split := strings.Split(s, "/")
 	lastWord := split[len(split)-1]
 	return lastWord
+}
+
+func GenerateRandomLetter() rune {
+	source := rand.NewSource(time.Now().UnixNano())
+	generator := rand.New(source)
+	// Alphabet
+	letters := "abcdefghijklmnopqrstuvwxyzdfjfsf"
+
+	// Generate a random index
+	randomIndex := generator.Intn(len(letters))
+
+	// Get the random letter
+	randomLetter := rune(letters[randomIndex])
+
+	return randomLetter
 }
