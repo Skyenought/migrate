@@ -51,7 +51,8 @@ func main() {
 		}
 		// gin -> server
 		{
-			v.RewriteImport(mconsts.GinPkg, mconsts.HertzServerPkg)
+			v.DeleteImport(mconsts.GinPkg)
+			v.AddImport(mconsts.HertzServerPkg)
 			v.ReplaceGinNew2ServerNew(c)
 		}
 		// rename gin.HandlerFunc -> app.HandlerFunc

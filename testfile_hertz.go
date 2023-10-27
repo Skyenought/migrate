@@ -21,6 +21,7 @@ func newHertzServer() {
 		c.BindJSON(&tt)
 		c.BindHeader(&tt)
 		c.BindPath(&tt)
+		_ = string(c.FormValue("test"))
 		method := string(c.Request.Method())
 		c.JSON(200, gin.H{"message": method})
 		c.Next(ctx)
