@@ -12,17 +12,6 @@ import (
 	"github.com/bytedance/gopkg/util/logger"
 )
 
-func DelElementFromSlice[T comparable](a []T, ele T) []T {
-	j := 0
-	for _, v := range a {
-		if v != ele {
-			a[j] = v
-			j++
-		}
-	}
-	return a[:j]
-}
-
 func GetAllGoFiles(dir string) []string {
 	var goFiles []string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -66,7 +55,6 @@ func IsSrvRequestFunc(funcIdent *ast.Ident) bool {
 func GetImportPaths(file *ast.File) []string {
 	var paths []string
 	for _, importSpec := range file.Imports {
-		// 获取导入路径
 		importPath, err := strconv.Unquote(importSpec.Path.Value)
 		if err != nil {
 			logger.Errorf("get import Paths error: %s", err.Error())

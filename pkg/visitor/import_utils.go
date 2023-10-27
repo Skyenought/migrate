@@ -2,7 +2,6 @@ package visitor
 
 import (
 	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
-	"github.com/hertz-contrib/migrate/pkg/global"
 	"go/ast"
 	"math/rand"
 	"time"
@@ -43,10 +42,8 @@ func (v *Visitor) AddImport(path string) {
 		// Check if the package name conflicts with the import path
 		if getlastWorld(oPath) == getlastWorld(path) {
 			// If a conflict exists, generate an alias for the import path and add it
-			astutil.AddNamedImport(v.fset, v.f, generateAlias(generateAlias(path)), path)
+			astutil.AddNamedImport(v.fset, v.f, generateAlias(path), path)
 			foundConflict = true
-			// Add the alias to the global alias map
-			global.AliasMap[path] = generateAlias(generateAlias(path))
 			break
 		}
 	}
