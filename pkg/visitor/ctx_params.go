@@ -23,11 +23,11 @@ func (v *Visitor) ChangeReqCtxSignature(c *astutil.Cursor) {
 			switch field.Names[0].Name {
 			case "c":
 				if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
-					mutils.ReplaceHandlerFuncParams(funcDecl, "ctx", "c")
+					v.ReplaceHandlerFuncParams(funcDecl, "ctx", "c")
 				}
 			case "ctx":
 				if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
-					mutils.ReplaceHandlerFuncParams(funcDecl, "c", "ctx")
+					v.ReplaceHandlerFuncParams(funcDecl, "c", "ctx")
 				}
 			}
 		}
@@ -57,11 +57,11 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 					switch paramName {
 					case "c":
 						if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
-							mutils.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
+							v.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
 						}
 					case "ctx":
 						if mutils.JudgeFuncParam(expr, mconsts.GinCtx) {
-							mutils.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+							v.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
 						}
 					}
 				}
@@ -84,11 +84,11 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 						switch paramName {
 						case "c":
 							if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
-								mutils.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
+								v.ReplaceHandlerFuncParamsByLit(funcLit, "ctx", "c")
 							}
 						case "ctx":
 							if mutils.JudgeFuncParam(field, mconsts.GinCtx) {
-								mutils.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
+								v.ReplaceHandlerFuncParamsByLit(funcLit, "c", "ctx")
 							}
 						}
 					}
@@ -96,4 +96,68 @@ func (v *Visitor) ChangeReqCtxSignatureInLine(c *astutil.Cursor) {
 			}
 		}
 	}
+}
+
+func (v *Visitor) ReplaceHandlerFuncParams(funcDecl *ast.FuncDecl, preCtx, newCtx string) {
+	// create new param ctx context.Context
+	newParam1 := &ast.Field{
+		Names: []*ast.Ident{ast.NewIdent(preCtx)},
+		Type:  &ast.Ident{Name: mconsts.NormalCtx},
+	}
+
+	// create new param c *app.RequestContext
+	getlastWorld := func(s string) string {
+		return mutils.GetLastWord(s)
+	}
+
+	pkgName := getlastWorld(mconsts.HertzAppPkg)
+	// find import alias
+	alias := v.FindImportAlias(mconsts.HertzAppPkg)
+	ident := ast.NewIdent(pkgName)
+	if alias != "" {
+		ident = ast.NewIdent(alias)
+	}
+
+	newParam2 := &ast.Field{
+		Names: []*ast.Ident{ast.NewIdent(newCtx)},
+		Type: &ast.StarExpr{
+			X: &ast.SelectorExpr{
+				X:   ident,
+				Sel: ast.NewIdent("RequestContext"),
+			},
+		},
+	}
+
+	// 替换参数列表
+	funcDecl.Type.Params.List = []*ast.Field{newParam1, newParam2}
+}
+
+func (v *Visitor) ReplaceHandlerFuncParamsByLit(funcDecl *ast.FuncLit, preCtx, newCtx string) {
+	// 创建新参数 ctx context.Context
+	newParam1 := &ast.Field{
+		Names: []*ast.Ident{ast.NewIdent(preCtx)},
+		Type:  &ast.Ident{Name: mconsts.NormalCtx},
+	}
+
+	// create new param c *app.RequestContext
+	getlastWorld := func(s string) string {
+		return mutils.GetLastWord(s)
+	}
+
+	pkgName := getlastWorld(mconsts.HertzAppPkg)
+	// find import alias
+	alias := v.FindImportAlias(mconsts.HertzAppPkg)
+	ident := ast.NewIdent(pkgName)
+	if alias != "" {
+		ident = ast.NewIdent(alias)
+	}
+
+	newParam2 := &ast.Field{
+		Names:   []*ast.Ident{ast.NewIdent(newCtx)},
+		Type:    &ast.StarExpr{X: &ast.SelectorExpr{X: ident, Sel: ast.NewIdent("RequestContext")}},
+		Comment: nil,
+	}
+
+	// 替换参数列表
+	funcDecl.Type.Params.List = []*ast.Field{newParam1, newParam2}
 }

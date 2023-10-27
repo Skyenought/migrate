@@ -2,9 +2,9 @@ package visitor
 
 import (
 	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
+	"github.com/hertz-contrib/migrate/pkg/global"
 	"go/ast"
 	"math/rand"
-	"strings"
 	"time"
 
 	"golang.org/x/tools/go/ast/astutil"
@@ -34,15 +34,19 @@ func (v *Visitor) AddImport(path string) {
 		return
 	}
 	var foundConflict = false
-
+	getlastWorld := func(s string) string {
+		return mutils.GetLastWord(s)
+	}
 	// Get all import paths in the file
 	originPaths := mutils.GetImportPaths(v.f)
 	for _, oPath := range originPaths {
 		// Check if the package name conflicts with the import path
-		if getLastWord(oPath) == getLastWord(path) {
+		if getlastWorld(oPath) == getlastWorld(path) {
 			// If a conflict exists, generate an alias for the import path and add it
-			astutil.AddNamedImport(v.fset, v.f, generateAlias(getLastWord(path)), path)
+			astutil.AddNamedImport(v.fset, v.f, generateAlias(generateAlias(path)), path)
 			foundConflict = true
+			// Add the alias to the global alias map
+			global.AliasMap[path] = generateAlias(generateAlias(path))
 			break
 		}
 	}
@@ -55,12 +59,15 @@ func (v *Visitor) AddImport(path string) {
 }
 
 func generateAlias(s string) string {
+	getlastWorld := func(s string) string {
+		return mutils.GetLastWord(s)
+	}
 	source := rand.NewSource(time.Now().UnixNano())
 	generator := rand.New(source)
 
 	// 生成随机字母
 	randomLetter := generateRandomLetter(generator)
-	alias := string(randomLetter) + getLastWord(s)
+	alias := string(randomLetter) + getlastWorld(s)
 	return alias
 }
 
@@ -77,12 +84,6 @@ func generateRandomLetter(generator *rand.Rand) rune {
 	return randomLetter
 }
 
-func getLastWord(s string) string {
-	split := strings.Split(s, "/")
-	lastWord := split[len(split)-1]
-	return lastWord
-}
-
 func ImportExists(f *ast.File, path string) bool {
 	for _, spec := range f.Imports {
 		if spec.Path.Value == `"`+path+`"` {
@@ -90,4 +91,16 @@ func ImportExists(f *ast.File, path string) bool {
 		}
 	}
 	return false
+}
+
+// FindImportAlias finds the alias of the import path.
+func (v *Visitor) FindImportAlias(importPath string) string {
+	for _, imp := range v.f.Imports {
+		if imp.Path.Value == `"`+importPath+`"` {
+			if imp.Name != nil {
+				return imp.Name.Name
+			}
+		}
+	}
+	return ""
 }

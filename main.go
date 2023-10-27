@@ -71,7 +71,7 @@ func main() {
 			v.ReplaceGinNext(c)
 			v.ReplaceGinShouldBindXxx(c)
 		}
-		v.ReplaceGinRun2HertzSpin(c)
+		v.ReplaceGinRun(c)
 		return true
 	}, nil)
 

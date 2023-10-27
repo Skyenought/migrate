@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/bytedance/gopkg/util/logger"
-	mconsts "github.com/hertz-contrib/migrate/pkg/common/consts"
 )
 
 func DelElementFromSlice[T comparable](a []T, ele T) []T {
@@ -47,42 +46,6 @@ func JudgeFuncParam(field *ast.Field, funcParam string) bool {
 	tmp := strings.Split(funcParam, ".")
 	packageName, StructName := tmp[0], tmp[1]
 	return isStarExpr && isSelExpr && selExpr.X.(*ast.Ident).Name == packageName && selExpr.Sel.Name == StructName
-}
-
-func ReplaceHandlerFuncParams(funcDecl *ast.FuncDecl, preCtx, newCtx string) {
-	// 创建新参数 ctx context.Context
-	newParam1 := &ast.Field{
-		Names: []*ast.Ident{ast.NewIdent(preCtx)},
-		Type:  &ast.Ident{Name: mconsts.NormalCtx},
-	}
-
-	// 创建新参数 c *app.RequestContext
-	newParam2 := &ast.Field{
-		Names:   []*ast.Ident{ast.NewIdent(newCtx)},
-		Type:    &ast.StarExpr{X: &ast.SelectorExpr{X: ast.NewIdent("app"), Sel: ast.NewIdent("RequestContext")}},
-		Comment: nil,
-	}
-
-	// 替换参数列表
-	funcDecl.Type.Params.List = []*ast.Field{newParam1, newParam2}
-}
-
-func ReplaceHandlerFuncParamsByLit(funcDecl *ast.FuncLit, preCtx, newCtx string) {
-	// 创建新参数 ctx context.Context
-	newParam1 := &ast.Field{
-		Names: []*ast.Ident{ast.NewIdent(preCtx)},
-		Type:  &ast.Ident{Name: mconsts.NormalCtx},
-	}
-
-	// 创建新参数 c *app.RequestContext
-	newParam2 := &ast.Field{
-		Names:   []*ast.Ident{ast.NewIdent(newCtx)},
-		Type:    &ast.StarExpr{X: &ast.SelectorExpr{X: ast.NewIdent("app"), Sel: ast.NewIdent("RequestContext")}},
-		Comment: nil,
-	}
-
-	// 替换参数列表
-	funcDecl.Type.Params.List = []*ast.Field{newParam1, newParam2}
 }
 
 func IsSrvRequestFunc(funcIdent *ast.Ident) bool {
@@ -132,4 +95,10 @@ func IsString(expr ast.Expr, value string) bool {
 func IsDot(expr ast.Expr, name string) bool {
 	sel, ok := expr.(*ast.SelectorExpr)
 	return ok && IsIdent(sel.Sel, name)
+}
+
+func GetLastWord(s string) string {
+	split := strings.Split(s, "/")
+	lastWord := split[len(split)-1]
+	return lastWord
 }

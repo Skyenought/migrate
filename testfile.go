@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hertz-contrib/migrate/pkg/app"
 	"github.com/hertz-contrib/migrate/pkg/common/utils"
 )
 
@@ -29,6 +30,7 @@ func newGinServer() {
 }
 
 func echoHandler(c *gin.Context) {
+	app.H()
 	c.JSON(200, gin.H{"message": "hello world"})
 }
 
