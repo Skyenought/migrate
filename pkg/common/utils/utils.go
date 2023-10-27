@@ -86,6 +86,10 @@ func ReplaceHandlerFuncParamsByLit(funcDecl *ast.FuncLit, preCtx, newCtx string)
 }
 
 func IsSrvRequestFunc(funcIdent *ast.Ident) bool {
+	if funcIdent == nil || funcIdent.Name == "" {
+		return false
+	}
+
 	return funcIdent.Name == "GET" ||
 		funcIdent.Name == "POST" ||
 		funcIdent.Name == "PUT" ||

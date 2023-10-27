@@ -2,12 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hertz-contrib/migrate/pkg/common/utils"
 )
 
 const _addr = ":8080"
 
 func newGinServer() {
 	engine := gin.New()
+	mutils.IsSrvRequestFunc(nil)
 	engine.GET("/", func(c *gin.Context) {
 		type Test struct {
 			Name        string `json:"name" uri:"name"`

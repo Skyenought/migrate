@@ -2,6 +2,7 @@ package visitor
 
 import (
 	mutils "github.com/hertz-contrib/migrate/pkg/common/utils"
+	"go/ast"
 	"math/rand"
 	"strings"
 	"time"
@@ -28,6 +29,10 @@ func (v *Visitor) RewriteImport(oldPath, newPath string) {
 //
 // Note: This function modifies the provided AST file.
 func (v *Visitor) AddImport(path string) {
+	// Check if the import already exists
+	if ImportExists(v.f, path) {
+		return
+	}
 	var foundConflict = false
 
 	// Get all import paths in the file
@@ -76,4 +81,13 @@ func getLastWord(s string) string {
 	split := strings.Split(s, "/")
 	lastWord := split[len(split)-1]
 	return lastWord
+}
+
+func ImportExists(f *ast.File, path string) bool {
+	for _, spec := range f.Imports {
+		if spec.Path.Value == `"`+path+`"` {
+			return true
+		}
+	}
+	return false
 }
