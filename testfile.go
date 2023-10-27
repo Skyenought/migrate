@@ -8,7 +8,6 @@ const _addr = ":8080"
 
 func newGinServer() {
 	engine := gin.New()
-	engine.Use(testMiddleware())
 	engine.GET("/", func(c *gin.Context) {
 		type Test struct {
 			Name        string `json:"name" uri:"name"`
@@ -31,8 +30,8 @@ func echoHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "hello world"})
 }
 
-func testMiddleware() gin.HandlerFunc {
+func testMiddleware() (gin.HandlerFunc, error) {
 	return func(c *gin.Context) {
 		c.Next()
-	}
+	}, nil
 }

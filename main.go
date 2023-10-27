@@ -60,6 +60,7 @@ func main() {
 			v.AddImport(mconsts.HertzAppPkg)
 			v.ChangeReqCtxSignatureInLine(c)
 			v.ChangeReqCtxSignature(c)
+			v.ReplaceGinHandlerFunc(c)
 		}
 		// inner handlerFunc
 		{

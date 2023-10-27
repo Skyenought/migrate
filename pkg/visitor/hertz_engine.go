@@ -25,3 +25,28 @@ func (v *Visitor) ReplaceGinRun2HertzSpin(c *astutil.Cursor) {
 		}
 	}
 }
+
+func (v *Visitor) ReplaceGinHandlerFunc(c *astutil.Cursor) {
+	indent, ok := c.Node().(*ast.Ident)
+	if !ok || indent.Obj == nil {
+		return
+	}
+
+	funcDecl, ok := indent.Obj.Decl.(*ast.FuncDecl)
+	if ok {
+		if funcDecl.Type.Results == nil {
+			return
+		}
+		for _, returnValue := range funcDecl.Type.Results.List {
+			if selExpr, ok := returnValue.Type.(*ast.SelectorExpr); ok {
+				if selExpr.X.(*ast.Ident).Name == "gin" && selExpr.Sel.Name == "HandlerFunc" {
+					newSelExpr := &ast.SelectorExpr{
+						X:   &ast.Ident{Name: "app"},
+						Sel: &ast.Ident{Name: "HandlerFunc"},
+					}
+					returnValue.Type = newSelExpr
+				}
+			}
+		}
+	}
+}
