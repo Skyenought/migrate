@@ -7,6 +7,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+// ReplaceGinRequestMethod c.Request.Method -> string(c.Request.Method())
 func (v *Visitor) ReplaceGinRequestMethod(c *astutil.Cursor) {
 	if selExpr, ok := c.Node().(*ast.SelectorExpr); ok {
 		if innerExpr, ok := selExpr.X.(*ast.SelectorExpr); ok {
@@ -35,9 +36,36 @@ func (v *Visitor) ReplaceGinRequestMethod(c *astutil.Cursor) {
 	}
 }
 
-// ReplaceGinRequestFormValue c.Requst.FormValue("") -> string(c.Request.FormValue(""))
+// ReplaceGinRequestFormValue c.Request.FormValue("") -> string(c.Request.FormValue(""))
 func (v *Visitor) ReplaceGinRequestFormValue(c *astutil.Cursor) {
+	expr, ok := c.Node().(*ast.CallExpr)
+	if !ok {
+		return
+	}
 
+	if selExpr, ok := expr.Fun.(*ast.SelectorExpr); ok {
+		if innerExpr, ok := selExpr.X.(*ast.SelectorExpr); ok {
+			// eg c Request FormValue "param"
+			firstIdent := innerExpr.X.(*ast.Ident)
+			secondIdent := innerExpr.Sel
+			thirdIdent := selExpr.Sel
+
+			if secondIdent.Name == "Request" && thirdIdent.Name == "FormValue" {
+				c.Replace(&ast.CallExpr{
+					Fun: &ast.Ident{Name: "string"},
+					Args: []ast.Expr{
+						&ast.CallExpr{
+							Fun: &ast.SelectorExpr{
+								X:   firstIdent, // 将 innerExpr.X 改为 innerExpr
+								Sel: thirdIdent,
+							},
+							Args: expr.Args,
+						},
+					},
+				})
+			}
+		}
+	}
 }
 
 func (v *Visitor) ReplaceGinNext(c *astutil.Cursor) {

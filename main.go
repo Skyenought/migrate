@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/bytedance/gopkg/util/logger"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -69,6 +70,7 @@ func main() {
 			v.AddImport(mconsts.HertzUtils)
 			v.ReplaceGinH2UtilsH(c)
 			v.ReplaceGinRequestMethod(c)
+			v.ReplaceGinRequestFormValue(c)
 			v.ReplaceGinNext(c)
 			v.ReplaceGinShouldBindXxx(c)
 		}
@@ -84,7 +86,7 @@ func main() {
 
 	var buf bytes.Buffer
 	if err := format.Node(&buf, fset, file); err != nil {
-		panic(err)
+		logger.Errorf("format.Node error: %v", err)
 	}
 	file, err = parser.ParseFile(fset, "", buf.String(), parser.ParseComments)
 	if err != nil {
