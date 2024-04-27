@@ -21,10 +21,11 @@ import (
 )
 
 var (
-	CtxSet     mapset.Set[string]
-	WebCtxSet  mapset.Set[string]
-	Options    []ast.Expr
-	ServerName string
+	CtxSet             mapset.Set[string]
+	WebCtxSet          mapset.Set[string]
+	HertzConfigOptions []ast.Expr
+	ServerName         string
+	ServerPort         ast.Expr
 )
 
 func init() {

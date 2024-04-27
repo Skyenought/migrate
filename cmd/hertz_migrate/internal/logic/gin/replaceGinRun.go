@@ -25,12 +25,14 @@ func ReplaceGinRun(node *ast.CallExpr) {
 	if sel, ok := node.Fun.(*ast.SelectorExpr); ok {
 		if ident, ok := sel.X.(*ast.Ident); ok {
 			if utils.CheckObjSelExpr(ident.Obj, "hzserver", "Default") ||
+				utils.CheckObjSelExpr(ident.Obj, "hzserver", "New") ||
 				utils.CheckObjStarExpr(ident.Obj, "hzserver", "Hertz") {
 				if sel.Sel.Name == "Run" {
 					sel.Sel.Name = "Spin"
-					node.Args = []ast.Expr{}
+					node.Args = nil
 				}
 			}
+
 			if utils.CheckObjSelExpr(ident.Obj, "http", "Server") {
 				if sel.Sel.Name == "ListenAndServe" {
 					ident.Name = internal.ServerName

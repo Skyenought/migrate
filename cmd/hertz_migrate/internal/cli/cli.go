@@ -73,7 +73,7 @@ type Args struct {
 const ignoreDirsText = `
 Fill in the folders to be ignored, separating the folders with ",".
 Example:
-    hertz_migrate -target-dir ./project -ignore-dirs=kitex_gen,hz_gen
+    hertz_migrate -target-dir ./project -ignore-dirs=hz_gen -ignore-dirs=vendor
 `
 
 func Init() *cli.App {
@@ -92,7 +92,7 @@ func Init() *cli.App {
 		&cli.StringFlag{
 			Name:        "target-dir",
 			Aliases:     []string{"d"},
-			Usage:       "project directory you wants to migrate",
+			Usage:       "Project directory you wants to migrate.",
 			Destination: &globalArgs.TargetDir,
 		},
 		&cli.StringSliceFlag{
@@ -109,19 +109,19 @@ func Init() *cli.App {
 		&cli.BoolFlag{
 			Name:        "use-gin",
 			Aliases:     []string{"g"},
-			Usage:       "migrate to hertz with gin as the web framework",
+			Usage:       "Use this flag to migrate gin to the hertz framework.",
 			Destination: &globalArgs.UseGin,
 		},
 		&cli.BoolFlag{
 			Name:        "use-net-http",
 			Aliases:     []string{"n"},
-			Usage:       "migrate to hertz with net/http as the web framework",
+			Usage:       "Use this flag to migrate net/http to the hertz framework.",
 			Destination: &globalArgs.UseNetHTTP,
 		},
 		&cli.BoolFlag{
 			Name:        "use-chi",
 			Aliases:     []string{"c"},
-			Usage:       "migrate to hertz with chi as the web framework",
+			Usage:       "Use this flag to migrate chi to the hertz framework.\nEnabling it will automatically enable the use-net-http flag",
 			Destination: &globalArgs.UseNetHTTP,
 		},
 	}
@@ -132,6 +132,7 @@ func Init() *cli.App {
 func Run(c *cli.Context) error {
 	fset = token.NewFileSet()
 	globalArgs.IgnoreDirs = c.StringSlice("ignore-dirs")
+
 	if globalArgs.UseChi {
 		globalArgs.UseNetHTTP = true
 	}
@@ -273,6 +274,7 @@ func processFiles(gofiles []string) error {
 
 		astutil.Apply(file, func(c *astutil.Cursor) bool {
 			netHttpGroup(c, webCtxSet)
+
 			switch node := c.Node().(type) {
 			case *ast.SelectorExpr:
 				if globalArgs.UseNetHTTP {
@@ -310,6 +312,7 @@ func processFiles(gofiles []string) error {
 			case *ast.CallExpr:
 				if globalArgs.UseChi {
 					chi.PackChiRouterMethod(node)
+					chi.PackChiNewRouter(node, c)
 				}
 				if globalArgs.UseNetHTTP {
 					nethttp.ReplaceHttpOp(node, c)
@@ -330,9 +333,6 @@ func processFiles(gofiles []string) error {
 			}
 			if globalArgs.UseGin {
 				gin.ReplaceCtxParamList(c)
-			}
-			if globalArgs.UseChi {
-				chi.PackChiNewRouter(c, globalMap)
 			}
 			return true
 		}, nil)

@@ -18,7 +18,6 @@ import (
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/utils"
 	"go/ast"
-
 	"golang.org/x/tools/go/ast/astutil"
 )
 
@@ -30,6 +29,8 @@ func ReplaceBinding(se *ast.SelectorExpr, cur *astutil.Cursor) {
 				cur.Replace(types.ExportCtxOp(ident.Name, "Bind"))
 			case "ShouldBind", "ShouldBindJSON", "ShouldBindQuery", "ShouldBindHeader":
 				cur.Replace(types.ExportCtxOp(ident.Name, "BindAndValidate"))
+			case "ShouldBindBodyWith", "ShouldBindWith":
+
 			}
 		}
 	}

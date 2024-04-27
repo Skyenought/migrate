@@ -15,6 +15,7 @@
 package gin
 
 import (
+	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
 	. "go/ast"
 
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal"
@@ -27,7 +28,12 @@ func ReplaceGinNew(call *CallExpr, c *astutil.Cursor) {
 	if sel, ok := call.Fun.(*SelectorExpr); ok {
 		if utils.CheckSelPkgAndStruct(sel, "gin", "New") ||
 			utils.CheckSelPkgAndStruct(sel, "gin", "Default") {
-			args := internal.Options
+			args := internal.HertzConfigOptions
+
+			// 为 gin.Run() 的参数列表不为空的情况
+			if internal.ServerPort != nil {
+				args = append(args, types.ExportServerOption("WithHostPorts", []Expr{internal.ServerPort}))
+			}
 			if as, ok := c.Parent().(*AssignStmt); ok {
 				if ident, ok := as.Lhs[0].(*Ident); ok {
 					internal.ServerName = ident.Name

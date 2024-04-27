@@ -72,11 +72,9 @@ func ReplaceCtxParamList(cur *astutil.Cursor) {
 				switch t := _stmt.X.(type) {
 				case *CallExpr:
 					replaceParamsWithFuncName(t)
-					continue
 				}
 			case *IfStmt:
 				ifStmtReplaceLogic(_stmt)
-				continue
 			case *SwitchStmt:
 				for _, s := range _stmt.Body.List {
 					if caseClause, ok := s.(*CaseClause); ok {
@@ -85,19 +83,15 @@ func ReplaceCtxParamList(cur *astutil.Cursor) {
 							case *ExprStmt:
 								if callExpr, ok := node.X.(*CallExpr); ok {
 									replaceParamsWithFuncName(callExpr)
-									continue
 								}
 							case *IfStmt:
 								ifStmtReplaceLogic(node)
-								continue
 							case *AssignStmt:
 								assignStmtReplaceLogic(node)
-								continue
 							case *ReturnStmt:
 								for _, field := range node.Results {
 									if ce, ok := field.(*CallExpr); ok {
 										replaceParamsWithFuncName(ce)
-										continue
 									}
 								}
 							}
@@ -106,12 +100,10 @@ func ReplaceCtxParamList(cur *astutil.Cursor) {
 				}
 			case *AssignStmt:
 				assignStmtReplaceLogic(_stmt)
-				continue
 			case *ReturnStmt:
 				for _, field := range _stmt.Results {
 					if ce, ok := field.(*CallExpr); ok {
 						replaceParamsWithFuncName(ce)
-						continue
 					}
 				}
 			}

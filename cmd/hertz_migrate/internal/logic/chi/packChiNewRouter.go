@@ -15,32 +15,28 @@
 package chi
 
 import (
+	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal"
 	. "go/ast"
-
-	nethttp "github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/logic/netHttp"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-func PackChiNewRouter(cur *astutil.Cursor, globalMap map[string]any) {
-	stmt, ok := cur.Node().(*AssignStmt)
-	if !ok || len(stmt.Lhs) != 1 || len(stmt.Rhs) != 1 {
-		return
-	}
-	callExpr, ok := stmt.Rhs[0].(*CallExpr)
-	if !ok {
-		return
-	}
+func PackChiNewRouter(callExpr *CallExpr, cur *astutil.Cursor) {
 	selExpr, ok := callExpr.Fun.(*SelectorExpr)
 	if !ok {
 		return
 	}
 	if selExpr.Sel.Name == "NewRouter" {
+		if as, ok := cur.Parent().(*AssignStmt); ok {
+			if ident, ok := as.Lhs[0].(*Ident); ok {
+				internal.ServerName = ident.Name
+			}
+		}
 		callExpr.Fun = &SelectorExpr{
 			X:   NewIdent("hzserver"),
 			Sel: NewIdent("Default"),
 		}
-		globalMap["serverName"] = stmt.Lhs[0].(*Ident).Name
-		nethttp.AddOptionsForServer(callExpr, globalMap)
+		callExpr.Args = internal.HertzConfigOptions
 	}
+
 }

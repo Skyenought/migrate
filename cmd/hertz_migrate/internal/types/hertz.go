@@ -490,21 +490,21 @@ func ExportedAppFSPtr(expr ...Expr) *UnaryExpr {
 					Key:   NewIdent("GenerateIndexPages"),
 					Value: expr[1],
 				},
-				&KeyValueExpr{
-					Key: NewIdent("PathRewrite"),
-					Value: &CallExpr{
-						Fun: &SelectorExpr{
-							X:   NewIdent("hzapp"),
-							Sel: NewIdent("NewPathSlashesStripper"),
-						},
-						Args: []Expr{
-							&BasicLit{
-								Kind:  token.INT,
-								Value: "100",
-							},
-						},
-					},
-				},
+				//&KeyValueExpr{
+				//	Key: NewIdent("PathRewrite"),
+				//	Value: &CallExpr{
+				//		Fun: &SelectorExpr{
+				//			X:   NewIdent("hzapp"),
+				//			Sel: NewIdent("NewPathSlashesStripper"),
+				//		},
+				//		Args: []Expr{
+				//			&BasicLit{
+				//				Kind:  token.INT,
+				//				Value: "100",
+				//			},
+				//		},
+				//	},
+				//},
 				&KeyValueExpr{
 					Key: NewIdent("IndexNames"),
 					Value: &CompositeLit{
