@@ -43,13 +43,11 @@ import (
 
 func init() {
 	globalMap = make(map[string]interface{})
-	webCtxSet = mapset.NewSet[string]()
 }
 
 var (
 	globalArgs = &Args{}
 	globalMap  map[string]any
-	webCtxSet  mapset.Set[string]
 	fset       *token.FileSet
 	wg         sync.WaitGroup
 
@@ -130,65 +128,43 @@ func Init() *cli.App {
 }
 
 func Run(c *cli.Context) error {
-	fset = token.NewFileSet()
-	globalArgs.IgnoreDirs = c.StringSlice("ignore-dirs")
+	var (
+		gofiles   []string
+		goModDirs []string
+		err       error
+	)
 
-	if globalArgs.UseChi {
-		globalArgs.UseNetHTTP = true
+	if gofiles, goModDirs, err = preload(c); err != nil {
+		return err
 	}
 
-	if globalArgs.Debug {
-		logs.SetLevel(logs.LevelDebug)
-	}
-
-	if globalArgs.TargetDir != "" {
-		gofiles, err := utils.CollectGoFiles(globalArgs.TargetDir, globalArgs.IgnoreDirs)
+	for _, path := range gofiles {
+		file, err := parser.ParseFile(fset, path, nil, 0)
 		if err != nil {
-			return err
+			logs.Debugf("Parse file fail, error: %v", err)
+			return internal.ErrParseFile
 		}
 
-		goModDirs, err := utils.SearchAllDirHasGoMod(globalArgs.TargetDir)
-		if err != nil {
-			return err
-		}
-
-		for _, dir := range goModDirs {
-			wg.Add(1)
-			dir := dir
-			go func() {
-				defer wg.Done()
-				utils.RunGoGet(dir, globalArgs.HzRepo)
-			}()
-		}
-		wg.Wait()
-
-		for _, path := range gofiles {
-			file, err := parser.ParseFile(fset, path, nil, 0)
-			if err != nil {
-				logs.Debugf("Parse file fail, error: %v", err)
-				return internal.ErrParseFile
+		// collect global information
+		astutil.Apply(file, func(c *astutil.Cursor) bool {
+			logic.GetHttpServerProps(c)
+			if globalArgs.UseGin {
+				gin.GetFuncNameHasGinCtx(c)
 			}
+			if globalArgs.UseNetHTTP {
+				nethttp.FindHandlerFuncName(c, internal.WebCtxSet)
+			}
+			return true
+		}, nil)
+	}
 
-			astutil.Apply(file, func(c *astutil.Cursor) bool {
-				logic.GetHttpServerProps(c)
-				if globalArgs.UseGin {
-					gin.GetFuncNameHasGinCtx(c)
-				}
-				if globalArgs.UseNetHTTP {
-					nethttp.FindHandlerFuncName(c, webCtxSet)
-				}
-				return true
-			}, nil)
-		}
+	if err = processFiles(gofiles); err != nil {
+		return err
+	}
 
-		if err = processFiles(gofiles); err != nil {
-			return err
-		}
-
-		for _, dir := range goModDirs {
-			utils.RunGoImports(dir)
-			utils.RunGoModTidy(dir)
-		}
+	for _, dir := range goModDirs {
+		utils.RunGoImports(dir)
+		utils.RunGoModTidy(dir)
 	}
 	logs.Info("everything are ok!")
 	return nil
@@ -273,7 +249,7 @@ func processFiles(gofiles []string) error {
 		}, nil)
 
 		astutil.Apply(file, func(c *astutil.Cursor) bool {
-			netHttpGroup(c, webCtxSet)
+			netHttpGroup(c, internal.WebCtxSet)
 
 			switch node := c.Node().(type) {
 			case *ast.SelectorExpr:
