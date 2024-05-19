@@ -83,21 +83,6 @@ func CheckProp(ident *Ident, name string) bool {
 	return false
 }
 
-func CheckStructName(selExpr *SelectorExpr, name string) bool {
-	if ident, ok := selExpr.X.(*Ident); ok {
-		if field, ok := ident.Obj.Decl.(*Field); ok {
-			selExpr, ok := field.Type.(*SelectorExpr)
-			if !ok {
-				return false
-			}
-			if selExpr.Sel.Name == name {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func ReplaceParamsInStr(s string) string {
 	re := regexp.MustCompile(`\{([^}]+)\}`)
 	resultString := re.ReplaceAllString(s, ":$1")

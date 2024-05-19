@@ -23,6 +23,7 @@ import (
 var (
 	CtxSet             mapset.Set[string]
 	WebCtxSet          mapset.Set[string]
+	GlobalHashMap      map[string]any
 	HertzConfigOptions []ast.Expr
 	ServerName         string
 	ServerPort         ast.Expr
@@ -31,4 +32,5 @@ var (
 func init() {
 	CtxSet = mapset.NewSet[string]()
 	WebCtxSet = mapset.NewSet[string]()
+	GlobalHashMap = make(map[string]any)
 }

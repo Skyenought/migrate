@@ -17,11 +17,6 @@ package internal
 import "errors"
 
 var (
-	ErrCollectGoFiles = errors.New("collect go files error")
-	ErrSearchGoMod    = errors.New("search go.mod dir fail")
-	ErrParseFile      = errors.New("parse go file fail")
-	ErrSaveChanges    = errors.New("change go file fail")
-	ErrGetAbsPath     = errors.New("get absolute path fail")
-	ErrRunCommand     = errors.New("run command fail")
-	ErrChangeDir      = errors.New("change directory fail")
+	ErrParseFile   = errors.New("parse go file fail")
+	ErrSaveChanges = errors.New("change go file fail")
 )

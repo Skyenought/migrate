@@ -15,8 +15,9 @@
 package chi
 
 import (
-	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal"
 	. "go/ast"
+
+	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
@@ -38,5 +39,4 @@ func PackChiNewRouter(callExpr *CallExpr, cur *astutil.Cursor) {
 		}
 		callExpr.Args = internal.HertzConfigOptions
 	}
-
 }

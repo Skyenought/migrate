@@ -15,9 +15,11 @@
 package gin
 
 import (
+	"go/ast"
+
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/utils"
-	"go/ast"
+
 	"golang.org/x/tools/go/ast/astutil"
 )
 

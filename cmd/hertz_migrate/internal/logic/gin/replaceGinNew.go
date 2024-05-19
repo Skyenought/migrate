@@ -15,8 +15,9 @@
 package gin
 
 import (
-	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
 	. "go/ast"
+
+	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
 
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal"
 	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/utils"

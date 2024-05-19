@@ -1,9 +1,11 @@
 package netHttp
 
 import (
-	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
 	. "go/ast"
 	"go/token"
+
+	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/types"
+
 	"golang.org/x/tools/go/ast/astutil"
 )
 

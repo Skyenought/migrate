@@ -25,6 +25,5 @@ func PackHandleFunc(cur *astutil.Cursor) {
 		if selExpr.Sel == nil {
 			return
 		}
-
 	}
 }

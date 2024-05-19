@@ -99,12 +99,6 @@ func CheckObjStarExpr(obj *Object, pkg, name string) bool {
 					return CheckFuncDeclReturnOne(i.Obj.Decl.(*FuncDecl), pkg, name)
 				}
 			}
-
-			//if se, ok := call.Fun.(*SelectorExpr); ok {
-			//	if i, ok := se.X.(*Ident); ok {
-			//		return CheckObjStarExpr(i.Obj, pkg, name)
-			//	}
-			//}
 		}
 	}
 	return false

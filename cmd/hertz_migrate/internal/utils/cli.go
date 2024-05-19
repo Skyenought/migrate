@@ -16,11 +16,12 @@ package utils
 
 import (
 	"fmt"
-	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/logs"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/hertz-contrib/migrate/cmd/hertz_migrate/internal/logs"
 )
 
 func RunGoImports(path string) {
@@ -40,21 +41,16 @@ func RunGoImports(path string) {
 	}
 }
 
-func RunGoGet(path, repo string) {
+func RunGoGet(path, repo string) error {
 	err := os.Chdir(path)
 	if err != nil {
-		fmt.Println("Error changing directory:", err)
-		return
+		return err
 	}
 	var cmd *exec.Cmd
 	cmd = exec.Command("go", "get", repo)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println("Error running command:", err)
-		return
-	}
+	return cmd.Run()
 }
 
 func RunGoModTidy(path string) {
